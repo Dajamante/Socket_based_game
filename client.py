@@ -12,15 +12,15 @@ class Client:
         self.addr = (SERVER, PORT)
 
     def run(self):
-
         msg = "String sent from client"
 
         while True:
             time.sleep(1)
             self.s.send(msg.encode('ascii'))
-
             retour = self.s.recv(1024)
-            print(retour)
+
+            # Ping back to client
+            print("Printing from client: " + str(retour))
         self.s.close()
 
 

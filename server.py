@@ -8,23 +8,34 @@ SERVER = "localhost"
 PORT = 65432
 
 
-def threaded_client(conn, q, id):
+class ThreadedClient():
 
-    while True:
-        # data received from client
-        data = conn.recv(1024).decode('ascii')
+    def __init__(self, conn, q, id):
+        self.conn = conn
+        self.q = q
+        self.id = id
 
-        if not data:
-            print('Bye')
-            break
-        q.put(data)
-        print(f"data from client {id} is put in queue")
+    def run(self):
+        while True:
+            # data received from client
+            data = self.conn.recv(1024).decode('ascii')
 
-        # testing response
-        msg_back = f"data from client {id} was put in server's queue"
-        conn.send(msg_back.encode('ascii'))
+            if not data:
+                print('Bye')
+                break
 
-    conn.close()
+            string_data = f"data from client {self.id} is put in queue"
+            print(string_data)
+            self.q.put(string_data)
+
+            # Can be used to testing response
+            # msg_back = f"ping back to client {self.id}"
+            # self.conn.send(msg_back.encode('ascii'))
+
+        self.conn.close()
+
+    def send_processed_data(self, data):
+        self.conn.send(data.encode('ascii'))
 
 
 class Server:
@@ -34,6 +45,7 @@ class Server:
         self.server_socket.bind((SERVER, PORT))
         self.server_socket.listen()
         self.queue = queue
+        self.client_list = []
 
     def run(self):
         # Starts with player 1, increment count for any new player
@@ -43,5 +55,12 @@ class Server:
             print("Waiting for connection, server started.")
             conn, address = self.server_socket.accept()
             print(f"Connected to :{address}")
-            start_new_thread(threaded_client, (conn, self.queue, count,))
+
+            # class threaded clients that has information on the server queue
+            # and the client connection
+            threaded_client = ThreadedClient(conn, self.queue, count)
+            self.client_list.append(threaded_client)
+
+            # all new clients have their own threads
+            start_new_thread(threaded_client.run, ())
             count += 1
