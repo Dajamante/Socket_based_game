@@ -19,13 +19,16 @@ class ThreadedClient():
         while True:
             # data received from client
             data = self.conn.recv(1024).decode('ascii')
-
             if not data:
                 print('Bye')
                 break
 
+            # formatting self.id ++ requested move
+
             string_data = f"data from client {self.id} is put in queue"
             print(string_data)
+
+            # put the json/dictionary in queue
             self.q.put(string_data)
 
             # Can be used to testing response
