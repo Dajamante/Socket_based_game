@@ -12,7 +12,7 @@ PORT = 65432
 
 
 class Client:
-    def __init__(self, id):
+    def __init__(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((SERVER, PORT))
         self.addr = (SERVER, PORT)
@@ -20,10 +20,6 @@ class Client:
         self.key = self.window.key
         self.mouse = self.window.mouse
 
-        #Kommer vi att behöva göra detta?? Kommer inte game bara skicka oss vår spelare?
-        #Initiate the player for which belongs to this client
-        self.entity = Entity(id=id, x=20, y=20+id, char='B',
-                             color=libtcod.white, blocked=True)
 
     def run(self):
         #msg = "String sent from client"
@@ -94,6 +90,6 @@ class Client:
 
 
 
-r = random.randint(0,5)
-c = Client(r)
+
+c = Client()
 c.run()
