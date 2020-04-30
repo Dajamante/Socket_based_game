@@ -19,7 +19,7 @@ class Client:
         self.window = Window()
         self.key = self.window.key
         self.mouse = self.window.mouse
-        
+
         #Kommer vi att behöva göra detta?? Kommer inte game bara skicka oss vår spelare?
         #Initiate the player for which belongs to this client
         self.entity = Entity(id=id, x=20, y=20+id, char='B',
@@ -38,7 +38,11 @@ class Client:
 
             while True:
 
-                #Receive the world and draw it
+                # The ServerPlayer (a representation of the client on the server)
+                # sends back a json object, the world with all entities
+                retour_world = self.s.recv(1024)
+
+                #Decode the message receive
                 try:
                     decoded_retour_world = json.loads(
                         retour_world.decode('utf-8'))
@@ -64,10 +68,6 @@ class Client:
                     json_dump = json.dumps(action).encode('utf-8')
                     self.s.sendall(json_dump)
 
-                    # The ServerPlayer (a representation of the client on the server)
-                    # sends back a json object, the world with all entities
-                    retour_world = self.s.recv(1024)
-                
                 # if the dictionary in handle keys have key word exit we close the window:
                 if "exit" in action:
                     print("Thank you for playing, good bye.")
