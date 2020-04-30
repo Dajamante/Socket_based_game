@@ -1,5 +1,10 @@
 import tcod as libtcod
 
+"""
+window object of client.
+Make sure that the screen width and height are the same than the world's (server)
+"""
+
 
 class Window:
 
@@ -17,5 +22,5 @@ def start(screen_width, screen_height):
         'arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
     libtcod.console_init_root(
-        screen_width, screen_height, 'libtcod tutorial game', False)
+        screen_width, screen_height, 'Jompai game', False)
     con = libtcod.console.Console(screen_width, screen_height)

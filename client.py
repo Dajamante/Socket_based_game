@@ -6,9 +6,15 @@ import random
 from input_handlers import handle_keys
 from entity import Entity
 from window import Window
-
+from _thread import *
 SERVER = "localhost"
 PORT = 65432
+
+"""
+Class client.
+Sending key press, getting world back one byte at a time.
+recv is blocking so the receiving is threaded.
+"""
 
 
 class Client:
@@ -20,24 +26,24 @@ class Client:
         self.key = self.window.key
         self.mouse = self.window.mouse
 
-    def run(self):
-        # msg = "String sent from client"
-
+    def receiver(self):
         while True:
-            time.sleep(0.15)
-            # try getting the world one byte at a time, until a new line.
             try:
                 msg = ""
                 rec_char_byte = self.client_socket.recv(1).decode("UTF-8")
                 while (rec_char_byte is not '\n'):
                     msg += rec_char_byte
                     rec_char_byte = self.client_socket.recv(1).decode("UTF-8")
-                print("msg   :  " + msg)
+                # print("msg   :  " + msg)
                 decoded_retour_world = json.loads(msg)
                 self.draw(decoded_retour_world, self.window)
                 msg = ""
             except Exception as ex:
                 print(ex)
+
+    def sender(self):
+        while True:
+            # try getting the world one byte at a time, until a new line.
 
             # Check for tangenttryckning
             libtcod.sys_check_for_event(
@@ -45,7 +51,7 @@ class Client:
 
             # Save action in dictionary
             action = handle_keys(self.key)
-            print(action)
+            # print(action)
 
             # if the dictionary in handle keys have key word move:
             if "move" in action:
@@ -62,7 +68,10 @@ class Client:
                 self.client_socket.close()
                 break
 
-        self.client_socket.close()
+    def run(self):
+        # msg = "String sent from client"
+        start_new_thread(self.receiver, ())
+        self.sender()
 
     # Draw, flush and and calls method clear for all entities
 

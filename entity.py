@@ -2,12 +2,13 @@ import tcod as libtcod
 from random import randint
 import json
 
+"""
+A generic object to represent players, walls and target objects.
+They are blocked by default.
+"""
+
 
 class Entity:
-    """
-    A generic object to represent players, walls and target objects.
-    They are blocked by default.
-    """
 
     def __init__(self, id, x, y, char='B', color=libtcod.white, blocked=True):
         self.id = id
