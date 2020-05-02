@@ -35,6 +35,7 @@ class ThreadedClient():
             # to be able to access that shit later
 
             data["id"] = self.id
+
             # string_data = f"data from client {self.id} is put in queue"
             # print(string_data)
 

@@ -15,11 +15,12 @@ World: manages entities to a list.
 Server: manage connections throught threaded clients
 
 TODO:
-    create walls
-    make sure objects such as players and walls are untraversable (with the boolean blocked, check old project)
-    make objects disappear when picked
-    make score for players
-    making winning condition and replay
+    1. create walls
+    2. make sure objects such as players and walls are untraversable (with the boolean blocked, check old project)
+    3. make objects disappear when picked
+    4. make score for players
+    5. making winning condition and replay
+    6. delete from world all players that are exiting the game
 """
 
 
@@ -35,7 +36,7 @@ class Game:
         self.server = Server(self.q)
         # launching a threaded server that can accept unlimited clients
         # and create threads for connections
-        count_clients = start_new_thread(self.server.run, ())
+        start_new_thread(self.server.run, ())
 
     # creating targets entities
     def make_entities(self):
@@ -61,6 +62,7 @@ class Game:
 
     def run_game(self):
         # making players with some distance, probably better way to do it.
+        # first player starts at x = 20, y = 20
         natural_distance = 20
         self.make_entities()
         # stream game once at start

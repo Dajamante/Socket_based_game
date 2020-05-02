@@ -26,14 +26,16 @@ class Client:
         self.key = self.window.key
         self.mouse = self.window.mouse
 
+    # send and recv : possible conflict?
     def receiver(self):
+        # try getting the world one byte at a time, until a new line.
         while True:
             try:
                 msg = ""
-                rec_char_byte = self.client_socket.recv(1).decode("UTF-8")
+                rec_char_byte = self.client_socket.recv(1).decode("ascii")
                 while (rec_char_byte is not '\n'):
                     msg += rec_char_byte
-                    rec_char_byte = self.client_socket.recv(1).decode("UTF-8")
+                    rec_char_byte = self.client_socket.recv(1).decode("ascii")
                 # print("msg   :  " + msg)
                 decoded_retour_world = json.loads(msg)
                 self.draw(decoded_retour_world, self.window)
@@ -43,7 +45,6 @@ class Client:
 
     def sender(self):
         while True:
-            # try getting the world one byte at a time, until a new line.
 
             # Check for tangenttryckning
             libtcod.sys_check_for_event(
@@ -78,6 +79,7 @@ class Client:
     def draw(self, world, window):
         for entity in world['entities']:
             print(entity)
+            libtcod.console_set_default_foreground(window,  entity['color'])
             libtcod.console_put_char(
                 window, entity['x'], entity['y'], entity['char'], libtcod.BKGND_NONE)
 

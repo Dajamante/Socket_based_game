@@ -53,13 +53,15 @@ They have a random color and random moves and are children class of entity.
 
 class TargetEntity(Entity):
 
+    # conflict on color, check if default parent override child default
     def __init__(self, x, y):
         self.id = 0
         self.char = '@'
-        self.rand_color = libtcod.Color(
+        self.color = libtcod.Color(
             randint(0, 255), randint(0, 255), randint(0, 255))
+
         super().__init__(x=x, y=y, id=self.id, char=self.char,
-                         color=self.rand_color, blocked=False)
+                         color=self.color, blocked=False)
 
     def random_move(self, screen_width, screen_height):
         die_x = randint(-1, 1)
