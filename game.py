@@ -16,11 +16,10 @@ Server: manage connections throught threaded clients
 
 TODO:
     1. create walls
-    2. make sure objects such as players and walls are untraversable (with the boolean blocked, check old project)
-    3. make objects disappear when picked
-    4. make score for players
-    5. making winning condition and replay
-    6. delete from world all players that are exiting the game
+    2. make sure objects such as players and walls are untraversable (methods already done in old project)
+    3. make score for players (check tutorial part 7)
+    4. making winning condition and eventual replay
+    5. delete from world all players that are exiting the game
 """
 
 
@@ -58,15 +57,22 @@ class Game:
         except (TypeError, AttributeError):
             print(f"what the fuck just happened with {id}")
 
+    # this method is called everytime a player move,
+    # and check if it crossed the path of a target
     def check_for_capture(self, player_id):
         player = self.world.get_entity(player_id)
         pl_x, pl_y = player.get_position()
         for e in self.world.entities:
+            # check for every targets if both
+            # x and y positions match, print capture message
+            # and delete from world
             if type(e) is TargetEntity:
                 e_x, e_y = e.get_position()
                 if(pl_x == e_x and pl_y == e_y):
                     print(f"Captured {e}!")
                     self.world.entities.remove(e)
+                    # todo : if len(self.world.entities) - countplayers == 0
+                    # publish scores eller något
 
     def stream_game(self):
         for client in self.server.thread_client_list:
