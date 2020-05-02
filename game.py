@@ -44,15 +44,29 @@ class Game:
         for i in range(self.world.max_entities):
             npc = TargetEntity(x=randint(1, self.world.world_width-5), y=randint(
                 1, self.world.world_height-5))
+            # print(type(npc))
+            # if type(npc) is TargetEntity:
+            #    print("Capture the flag")
             self.world.entities.append(npc)
 
     # move the entity by id
+
     def update_position(self, id, dx, dy):
         try:
             ent = self.world.get_entity(id)
             ent.move(dx, dy)
         except (TypeError, AttributeError):
             print(f"what the fuck just happened with {id}")
+
+    def check_for_capture(self, player_id):
+        player = self.world.get_entity(player_id)
+        pl_x, pl_y = player.get_position()
+        for e in self.world.entities:
+            if type(e) is TargetEntity:
+                e_x, e_y = e.get_position()
+                if(pl_x == e_x and pl_y == e_y):
+                    print(f"Captured {e}!")
+                    self.world.entities.remove(e)
 
     def stream_game(self):
         for client in self.server.thread_client_list:
@@ -63,7 +77,7 @@ class Game:
     def run_game(self):
         # making players with some distance, probably better way to do it.
         # first player starts at x = 20, y = 20
-        natural_distance = 20
+        natural_distance = 10
         self.make_entities()
         # stream game once at start
         self.stream_game()
@@ -90,6 +104,7 @@ class Game:
                     dx, dy = dict.get("move")[0], dict.get("move")[1]
                     self.update_position(id=id, dx=dx, dy=dy)
                     self.stream_game()
+                    self.check_for_capture(id)
 
 
 game = Game()
