@@ -1,14 +1,16 @@
 import tcod as libtcod
 from random import randint
+import json
+
+"""
+A generic object to represent players, walls and target objects.
+They are blocked by default.
+"""
 
 
 class Entity:
-    """
-    A generic object to represent players, walls and target objects.
-    They are blocked by default.
-    """
 
-    def __init__(self, id, x, y, char, color=libtcod.white, blocked=True):
+    def __init__(self, id, x, y, char='B', color=libtcod.white, blocked=True):
         self.id = id
         self.x = x
         self.y = y
@@ -38,6 +40,10 @@ class Entity:
                 return True
         return False
 
+    def to_json(self):
+        return json.dumps(self, default=lambda obj: obj.__dict__,
+                          sort_keys=True)
+
 
 """
 Target entities to be picked.
@@ -48,10 +54,12 @@ They have a random color and random moves and are children class of entity.
 class TargetEntity(Entity):
 
     def __init__(self, x, y):
+        self.id = 0
         self.char = '@'
         self.rand_color = libtcod.Color(
             randint(0, 255), randint(0, 255), randint(0, 255))
-        super().__init__(x, y, self.char, self.rand_color, blocked=False)
+        super().__init__(x=x, y=y, id=self.id, char=self.char,
+                         color=self.rand_color, blocked=False)
 
     def random_move(self, screen_width, screen_height):
         die_x = randint(-1, 1)
