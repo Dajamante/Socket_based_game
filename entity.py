@@ -51,12 +51,6 @@ class PlayerEntity(Entity):
         self.id = id
         self.points = 0
 
-    def move(self, dx, dy):
-        # Move the entity by a given amount
-        self.x += dx
-        self.y += dy
-        return (self.x, self.y)
-
     def updatePoints(self):
         self.points += 1
 
@@ -83,6 +77,12 @@ class TargetEntity(Entity):
         else:
             pass
 
+    def move(self, dx, dy):
+        # Move the entity by a given amount
+        self.x += dx
+        self.y += dy
+        return (self.x, self.y)
+
 
 class WallEntity(Entity):
 
@@ -92,5 +92,4 @@ class WallEntity(Entity):
         self.color = libtcod.red
 
         super().__init__(x=x, y=y, id=self.id, char=self.char,
-                         color=self.color, blocked=True) #Hur fungerar detta hur vet denna att den är super till just klassen Entity?
-
+                         color=self.color, blocked=True)  # Hur fungerar detta hur vet denna att den är super till just klassen Entity?
