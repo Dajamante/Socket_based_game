@@ -79,14 +79,18 @@ class Game:
             #    print("Capture the flag")
             self.world.entities.append(npc)
 
-    # move the entity by id
 
+    # move the entity by id if it does not hit wall
     def update_position(self, id, dx, dy):
-        try:
-            ent = self.world.get_entity(id)
-            ent.move(dx, dy)
+        try: 
+            print("tries to update position")
+            if self.check_if_wall(id, dx, dy) is False:
+                print("has checked if wall")
+                ent = self.world.get_entity(id)
+                ent.move(dx, dy)   
         except (TypeError, AttributeError):
             print(f"what the fuck just happened with {id}")
+
 
     def update_score(self, player_id):
         player = self.world.get_entity(player_id)
@@ -114,6 +118,25 @@ class Game:
                     self.update_score(player_id)
                     # todo : if len(self.world.entities) - countplayers == 0
                     # publish scores eller något
+    
+    # this method is called when a players position is about to get updated
+    # checks if the position it is about to move to is a wall
+    def check_if_wall(self, player_id, dx ,dy):
+        player = self.world.get_entity(player_id)
+        pl_x, pl_y = player.get_position()
+        pl_x += dx
+        pl_y += dy
+        for e in self.world.entities:
+            # check for every targets if both
+            # x and y positions match, return true
+            if type(e) is WallEntity:
+                e_x, e_y = e.get_position()
+                if(pl_x == e_x and pl_y == e_y):
+                    print(f"Player {player_id} hit the wall!")
+                    return True
+        
+        return False
+
 
     def stream_game(self):
         for client in self.server.thread_client_list:
