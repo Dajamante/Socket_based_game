@@ -38,7 +38,8 @@ class Client:
                     rec_char_byte = self.client_socket.recv(1).decode("ascii")
                 # print("msg   :  " + msg)
                 decoded_retour_world = json.loads(msg)
-                self.draw(decoded_retour_world, self.window)
+                scores = self.get_scores(decoded_retour_world)
+                self.draw(decoded_retour_world, self.window, scores)
                 msg = ""
             except Exception as ex:
                 print(ex)
@@ -74,15 +75,25 @@ class Client:
         start_new_thread(self.receiver, ())
         self.sender()
 
-    # Draw, flush and and calls method clear for all entities
-
-    def draw(self, world, window):
+    def get_scores(self, world):
+        scores = ""
         for entity in world['entities']:
             print(entity)
-            libtcod.console_set_default_foreground(window,  entity['color'])
+            if "id" in entity:
+                scores += "Player " + \
+                    str(entity['id']) + " : " + \
+                    str(entity["points"]) + " points\n"
+                print(scores)
+        return scores
+
+    def draw(self, world, window, scores):
+        libtcod.console_print(window, 5, 45, scores)
+
+        for entity in world['entities']:
+            print(entity)
+            libtcod.console_set_default_foreground(window, entity['color'])
             libtcod.console_put_char(
                 window, entity['x'], entity['y'], entity['char'], libtcod.BKGND_NONE)
-
         libtcod.console_flush()
         for entity in world['entities']:
             self.clear(entity, self.window)
