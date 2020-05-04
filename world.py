@@ -4,7 +4,7 @@ import json
 class World:
     def __init__(self):
         # max entities on screen
-        self.max_entities = 7
+        self.max_entities = 17
         # world dimentions, must be the same than client's
         self.world_width = 50
         self.world_height = 50
