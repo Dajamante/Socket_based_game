@@ -129,7 +129,7 @@ class Game:
         for e in self.world.entities:
             # check for every targets if both
             # x and y positions match, return true
-            if type(e) is WallEntity:
+            if (type(e) is WallEntity) or (type(e) is PlayerEntity):
                 e_x, e_y = e.get_position()
                 if(pl_x == e_x and pl_y == e_y):
                     print(f"Player {player_id} hit the wall!")
