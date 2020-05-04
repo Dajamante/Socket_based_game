@@ -54,6 +54,12 @@ class PlayerEntity(Entity):
     def updatePoints(self):
         self.points += 1
 
+    def move(self, dx, dy):
+        # Move the entity by a given amount
+        self.x += dx
+        self.y += dy
+        return (self.x, self.y)
+
 
 class TargetEntity(Entity):
 
@@ -76,12 +82,6 @@ class TargetEntity(Entity):
             self.move(die_x, die_y)
         else:
             pass
-
-    def move(self, dx, dy):
-        # Move the entity by a given amount
-        self.x += dx
-        self.y += dy
-        return (self.x, self.y)
 
 
 class WallEntity(Entity):
