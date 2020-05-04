@@ -4,6 +4,7 @@ from _thread import *
 import threading
 from entity import Entity
 from entity import TargetEntity
+from entity import PlayerEntity
 from random import randint
 from world import World
 import json
@@ -15,9 +16,9 @@ World: manages entities to a list.
 Server: manage connections throught threaded clients
 
 TODO:
-    1. create walls
-    2. make sure objects such as players and walls are untraversable (methods already done in old project)
-    3. make score for players (check tutorial part 7)
+    1. create walls (johanna)
+    2. make sure objects such as players and walls are untraversable (methods already done in old project) (johanna)
+    3. make score for players (check tutorial part 7) (aissata)
     4. making winning condition and eventual replay
     5. delete from world all players that are exiting the game
 """
@@ -57,10 +58,19 @@ class Game:
         except (TypeError, AttributeError):
             print(f"what the fuck just happened with {id}")
 
+    def update_score(self, player_id):
+        player = self.world.get_entity(player_id)
+        print(player)
+        player.points += 1
+
     # this method is called everytime a player move,
     # and check if it crossed the path of a target
     def check_for_capture(self, player_id):
+        print("what is player id? : " + str(player_id))
+
         player = self.world.get_entity(player_id)
+        print(f"fetched object? {player}")
+        print(f"type of fetch object? {type(player)}")
         pl_x, pl_y = player.get_position()
         for e in self.world.entities:
             # check for every targets if both
@@ -71,6 +81,7 @@ class Game:
                 if(pl_x == e_x and pl_y == e_y):
                     print(f"Captured {e}!")
                     self.world.entities.remove(e)
+                    self.update_score(player_id)
                     # todo : if len(self.world.entities) - countplayers == 0
                     # publish scores eller något
 
@@ -100,16 +111,17 @@ class Game:
                 # if new player or movement, stream game
                 # TODO: stream game if exit.
                 elif "player" in dict:
-                    cl = Entity(x=natural_distance,
-                                y=natural_distance, char='B', id=dict.get("player"))
+                    cl = PlayerEntity(x=natural_distance,
+                                      y=natural_distance, char='B', id=dict.get("player"))
                     self.world.entities.append(cl)
-                    natural_distance += 20
+                    natural_distance += natural_distance
                     self.stream_game()
                 elif "move" in dict:
                     id = dict.get('id')
                     dx, dy = dict.get("move")[0], dict.get("move")[1]
                     self.update_position(id=id, dx=dx, dy=dy)
                     self.stream_game()
+                    print("id will be checked for capture : " + str(id))
                     self.check_for_capture(id)
 
 

@@ -10,8 +10,7 @@ They are blocked by default.
 
 class Entity:
 
-    def __init__(self, id, x, y, char='B', color=libtcod.white, blocked=True):
-        self.id = id
+    def __init__(self, x, y, char='B', color=libtcod.white, blocked=True):
         self.x = x
         self.y = y
         self.char = char
@@ -19,12 +18,6 @@ class Entity:
         self.blocked = blocked
 
     def get_position(self):
-        return (self.x, self.y)
-
-    def move(self, dx, dy):
-        # Move the entity by a given amount
-        self.x += dx
-        self.y += dy
         return (self.x, self.y)
 
     def set_position(self, x, y):
@@ -51,16 +44,32 @@ They have a random color and random moves and are children class of entity.
 """
 
 
+class PlayerEntity(Entity):
+
+    def __init__(self, id, x, y, char='B', color=libtcod.white, blocked=True):
+        super().__init__(x, y, char=char, color=color, blocked=blocked)
+        self.id = id
+        self.points = 0
+
+    def move(self, dx, dy):
+        # Move the entity by a given amount
+        self.x += dx
+        self.y += dy
+        return (self.x, self.y)
+
+    def updatePoints(self):
+        self.points += 1
+
+
 class TargetEntity(Entity):
 
     # conflict on color, check if default parent override child default
     def __init__(self, x, y):
-        self.id = 0
         self.char = '@'
         self.color = libtcod.Color(
             randint(0, 255), randint(0, 255), randint(0, 255))
 
-        super().__init__(x=x, y=y, id=self.id, char=self.char,
+        super().__init__(x=x, y=y, char=self.char,
                          color=self.color, blocked=False)
 
     def random_move(self, screen_width, screen_height):
