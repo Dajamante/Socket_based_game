@@ -5,6 +5,8 @@ class World:
     def __init__(self):
         # max entities on screen
         self.max_entities = 17
+        # max wall tiles
+        self.max_walls = 10
         # world dimentions, must be the same than client's
         self.world_width = 50
         self.world_height = 50
