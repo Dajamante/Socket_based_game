@@ -5,6 +5,7 @@ import threading
 from entity import Entity
 from entity import TargetEntity
 from entity import PlayerEntity
+from entity import WallEntity
 from random import randint
 from world import World
 import json
@@ -16,9 +17,9 @@ World: manages entities to a list.
 Server: manage connections throught threaded clients
 
 TODO:
-    1. create walls (johanna)
-    2. make sure objects such as players and walls are untraversable (methods already done in old project) (johanna)
-    3. make score for players (check tutorial part 7) (aissata)
+    1. create walls (Johanna)
+    2. make sure objects such as players and walls are untraversable (methods already done in old project) (Johanna)
+    3. make score for players (check tutorial part 7)(Aissata)
     4. making winning condition and eventual replay
     5. delete from world all players that are exiting the game
 """
@@ -38,8 +39,36 @@ class Game:
         # and create threads for connections
         start_new_thread(self.server.run, ())
 
+    # creating map
+    def make_map(self):
+        #Every second wall will be vertical
+        verticalWall = False
+
+        for i in range(self.world.max_walls):
+            #Decide where wall should start
+            wall_start_x = randint(1, self.world.world_width-5)
+            wall_start_y = randint(1, self.world.world_height-5)
+            
+            #Each wall can consist of 0-7 tiles
+            for j in range(randint(0, 7)):
+                #add all tiles the wall will consist of
+                if (verticalWall):
+                    wall_tile = WallEntity(x=wall_start_x, y=wall_start_y + j)
+                    self.world.entities.append(wall_tile)
+                else:
+                    wall_tile = WallEntity(x=wall_start_x + j, y=wall_start_y)
+                    self.world.entities.append(wall_tile)
+            
+            #Switch between horizontal and vertical wall
+            if (verticalWall):
+                    verticalWall = False
+            else: 
+                verticalWall = True
+
+    
     # creating targets entities
     def make_entities(self):
+    
 
         for i in range(self.world.max_entities):
             npc = TargetEntity(x=randint(1, self.world.world_width-5), y=randint(
@@ -95,6 +124,9 @@ class Game:
         # making players with some distance, probably better way to do it.
         # first player starts at x = 20, y = 20
         natural_distance = 10
+        #create walls 
+        self.make_map()
+        #create all targetentitites
         self.make_entities()
         # stream game once at start
         self.stream_game()

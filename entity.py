@@ -82,3 +82,15 @@ class TargetEntity(Entity):
             self.move(die_x, die_y)
         else:
             pass
+
+
+class WallEntity(Entity):
+
+    def __init__(self, x, y):
+        self.id = 0
+        self.char = '#'
+        self.color = libtcod.red
+
+        super().__init__(x=x, y=y, id=self.id, char=self.char,
+                         color=self.color, blocked=True) #Hur fungerar detta hur vet denna att den är super till just klassen Entity?
+
