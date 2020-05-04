@@ -8,12 +8,12 @@ Make sure that the screen width and height are the same than the world's (server
 
 class Window:
 
-    def __init__(self):
+    def __init__(self, width=50, height=50):
 
         self.key = libtcod.Key()
         self.mouse = libtcod.Mouse()
-        self.screen_width = 50
-        self.screen_height = 50
+        self.screen_width = width
+        self.screen_height = height
         start(self.screen_width, self.screen_height)
 
 
