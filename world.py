@@ -16,8 +16,9 @@ class World:
     # and delete them
     def get_entity(self, id):
         for entity in self.entities:
-            if entity.id == id:
-                return entity
+            if hasattr(entity, 'id'):
+                if entity.id == id:
+                    return entity
         return None
 
     def to_json(self):
