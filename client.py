@@ -45,14 +45,15 @@ class Client:
                 winner = self.check_winner(decoded_retour_world)
                 if (winner > 0):
                     winner_str = self.get_winner_string(winner)
-                    self.draw_finish_screen(decoded_retour_world, self.window, winner_str)
+                    self.draw_finish_screen(
+                        decoded_retour_world, self.window, winner_str)
                     msg = ""
                 else:
                     self.draw(decoded_retour_world, self.window, scores, time)
                     msg = ""
             except Exception as ex:
                 print(ex)
-        
+
     def sender(self):
         while True:
 
@@ -94,22 +95,21 @@ class Client:
                     str(entity["points"]) + " points\n"
                 print(scores)
         return scores
-    
-    def get_time(self, world):
-        return "Time  " + str(world['clock'])[0:3]
 
-    #Check if there is a winner and return the id
+    def get_time(self, world):
+        return "Time  " + str(world['clock'])
+
+    # Check if there is a winner and return the id
     def check_winner(self, world):
         if world['winner'] > 0:
             return world["winner"]
         else:
             return 0
-    
+
     def get_winner_string(self, winner):
         return "The winner is " + str(winner)
 
 
-    
     def draw(self, world, window, scores, time):
         libtcod.console_print(window, 5, 45, scores)
         libtcod.console_print(window, 5, 47, time)
@@ -130,7 +130,7 @@ class Client:
     def draw_finish_screen(self, world, window, winner):
         for entity in world['entities']:
             self.clear(entity, self.window)
-        
+
         libtcod.console_print(window, 20, 20, winner)
         libtcod.console_flush()
 

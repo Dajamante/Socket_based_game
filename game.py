@@ -150,7 +150,7 @@ class Game:
             json_dump = self.world.to_json()
             print(json_dump)
             client.send_processed_data(json_dump)
-            time.sleep(0.05)
+            time.sleep(0.2)
 
     def run_game(self):
         # initiate clock
@@ -166,42 +166,41 @@ class Game:
         # stream game once at start
         self.stream_game()
 
-        while True:
-            while time_left:
-                end = time.time()
-                self.stream_game()
-                self.world.clock = end - start
-                if (end - start) > 200:
-                    time_left = False
+        while time_left:
+            end = time.time()
+            self.stream_game()
+            self.world.clock = round(end - start, 1)
+            if (end - start) > 200:
+                time_left = False
 
-                # processing the queue that threaded_clients are filling
-                if not self.q.empty():
+            # processing the queue that threaded_clients are filling
+            if not self.q.empty():
 
-                    dict = self.q.get()
-                    # sometimes we have none objects that crash the application
-                    # we skip when dict is none
-                    if dict is None:
-                        continue
-                    # if new player or movement, stream game
-                    # TODO: stream game if exit.
-                    elif "player" in dict:
-                        cl = PlayerEntity(x=natural_distance,
-                                          y=natural_distance, char='B', id=dict.get("player"))
-                        self.world.entities.append(cl)
-                        natural_distance += natural_distance
+                dict = self.q.get()
+                # sometimes we have none objects that crash the application
+                # we skip when dict is none
+                if dict is None:
+                    continue
+                # if new player or movement, stream game
+                # TODO: stream game if exit.
+                elif "player" in dict:
+                    cl = PlayerEntity(x=natural_distance,
+                                      y=natural_distance, char='B', id=dict.get("player"))
+                    self.world.entities.append(cl)
+                    natural_distance += natural_distance
 
-                    elif "move" in dict:
-                        id = dict.get('id')
-                        dx, dy = dict.get("move")[0], dict.get("move")[1]
-                        self.update_position(id=id, dx=dx, dy=dy)
+                elif "move" in dict:
+                    id = dict.get('id')
+                    dx, dy = dict.get("move")[0], dict.get("move")[1]
+                    self.update_position(id=id, dx=dx, dy=dy)
 
-                        print("id will be checked for capture : " + str(id))
-                        self.check_for_capture(id)
+                    print("id will be checked for capture : " + str(id))
+                    self.check_for_capture(id)
 
-            self.world.winner = self.check_winner().id
-            while not time_left:
-                self.stream_game()
-                print('I have sent the winner to client')
+        self.world.winner = self.check_winner().id
+        while not time_left:
+            self.stream_game()
+            print('I have sent the winner to client')
 
 
 game = Game()
