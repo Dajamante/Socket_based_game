@@ -55,4 +55,4 @@ while (rec_char_byte is not '\n'):
 decoded_retour_world = json.loads(msg)
 ```
 
-// rutor och hur man rör sig mellan olika states
+![](stategame.png)
