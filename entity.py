@@ -33,6 +33,31 @@ class Entity:
                 return True
         return False
 
+    # this method is called when a players position is about to get updated
+    # checks if the position it is about to move to is a wall
+
+    def has_hinder(self, world, dx, dy):
+        pl_x, pl_y = self.get_position()
+        pl_x += dx
+        pl_y += dy
+        for e in world.entities:
+            # check for every targets if both
+            # x and y positions match, return true
+            if (e != self and e.x == pl_x and e.y == pl_y and e.blocked == True):
+                print(type(e))
+                print(f"Player {self.id} hit a hinder!")
+                return True
+        return False
+
+    def is_already_occupied(self, world):
+        x, y = self.get_position()
+        for e in world.entities:
+            # check for every targets if both
+            # x and y positions match, return true
+            if (e != self and e.x == x and e.y == y):
+                return True
+        return False
+
     def to_json(self):
         return json.dumps(self, default=lambda obj: obj.__dict__,
                           sort_keys=True)
