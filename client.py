@@ -43,10 +43,10 @@ class Client:
                 msg = ""
             except Exception as ex:
                 print(ex)
+                break
 
     def sender(self):
         while True:
-
             # Check for tangenttryckning
             libtcod.sys_check_for_event(
                 libtcod.EVENT_KEY_PRESS, self.key, self.mouse)
@@ -90,7 +90,7 @@ class Client:
         libtcod.console_print(window, 5, 45, scores)
 
         for entity in world['entities']:
-            print(entity)
+            # print(entity)
             libtcod.console_set_default_foreground(window, entity['color'])
             libtcod.console_put_char(
                 window, entity['x'], entity['y'], entity['char'], libtcod.BKGND_NONE)
