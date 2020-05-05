@@ -76,18 +76,17 @@ class Game:
             #    print("Capture the flag")
             self.world.entities.append(npc)
 
-
     # move the entity by id if it does not hit wall
+
     def update_position(self, id, dx, dy):
-        try: 
+        try:
             print("tries to update position")
             if self.check_if_wall(id, dx, dy) is False:
                 print("has checked if wall")
                 ent = self.world.get_entity(id)
-                ent.move(dx, dy)   
+                ent.move(dx, dy)
         except (TypeError, AttributeError):
             print(f"what the fuck just happened with {id}")
-
 
     def update_score(self, player_id):
         player = self.world.get_entity(player_id)
@@ -115,10 +114,10 @@ class Game:
                     self.update_score(player_id)
                     # todo : if len(self.world.entities) - countplayers == 0
                     # publish scores eller något
-    
+
     # this method is called when a players position is about to get updated
     # checks if the position it is about to move to is a wall
-    def check_if_wall(self, player_id, dx ,dy):
+    def check_if_wall(self, player_id, dx, dy):
         player = self.world.get_entity(player_id)
         pl_x, pl_y = player.get_position()
         pl_x += dx
@@ -131,7 +130,7 @@ class Game:
                 if(pl_x == e_x and pl_y == e_y):
                     print(f"Player {player_id} hit the wall!")
                     return True
-        
+
         return False
 
     def check_winner(self):
@@ -151,9 +150,10 @@ class Game:
             json_dump = self.world.to_json()
             print(json_dump)
             client.send_processed_data(json_dump)
+            time.sleep(0.05)
 
     def run_game(self):
-        #initiate clock
+        # initiate clock
         start = time.time()
         time_left = True
         # making players with some distance, probably better way to do it.
@@ -165,44 +165,44 @@ class Game:
         self.make_entities()
         # stream game once at start
         self.stream_game()
-        
-        while time_left:
-            end = time.time()
-            self.world.clock = end - start
-            if (end - start) > 20:
-                time_left = False
-            
-            # processing the queue that threaded_clients are filling
-            if not self.q.empty():
-                
-                dict = self.q.get()
-                # sometimes we have none objects that crash the application
-                # we skip when dict is none
-                if dict is None:
-                    continue
-                # if new player or movement, stream game
-                # TODO: stream game if exit.
-                elif "player" in dict:
-                    cl = PlayerEntity(x=natural_distance,
-                                      y=natural_distance, char='B', id=dict.get("player"))
-                    self.world.entities.append(cl)
-                    natural_distance += natural_distance
-                    self.stream_game()
-                elif "move" in dict:
-                    id = dict.get('id')
-                    dx, dy = dict.get("move")[0], dict.get("move")[1]
-                    self.update_position(id=id, dx=dx, dy=dy)
-                    self.stream_game()
-                    print("id will be checked for capture : " + str(id))
-                    self.check_for_capture(id)
-            
-        
-        self.world.winner = self.check_winner().id
-        while not time_left:
-            self.stream_game()
-            print('I have sent the winner to client')
-            time.sleep(2)
-            
+
+        while True:
+            while time_left:
+                end = time.time()
+                self.stream_game()
+                self.world.clock = end - start
+                if (end - start) > 200:
+                    time_left = False
+
+                # processing the queue that threaded_clients are filling
+                if not self.q.empty():
+
+                    dict = self.q.get()
+                    # sometimes we have none objects that crash the application
+                    # we skip when dict is none
+                    if dict is None:
+                        continue
+                    # if new player or movement, stream game
+                    # TODO: stream game if exit.
+                    elif "player" in dict:
+                        cl = PlayerEntity(x=natural_distance,
+                                          y=natural_distance, char='B', id=dict.get("player"))
+                        self.world.entities.append(cl)
+                        natural_distance += natural_distance
+
+                    elif "move" in dict:
+                        id = dict.get('id')
+                        dx, dy = dict.get("move")[0], dict.get("move")[1]
+                        self.update_position(id=id, dx=dx, dy=dy)
+
+                        print("id will be checked for capture : " + str(id))
+                        self.check_for_capture(id)
+
+            self.world.winner = self.check_winner().id
+            while not time_left:
+                self.stream_game()
+                print('I have sent the winner to client')
+
 
 game = Game()
 game.run_game()
