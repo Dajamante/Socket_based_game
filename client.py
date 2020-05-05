@@ -42,15 +42,27 @@ class Client:
                 decoded_retour_world = json.loads(msg)
                 scores = self.get_scores(decoded_retour_world)
                 time = self.get_time(decoded_retour_world)
-                winner = self.check_winner(decoded_retour_world)
-                if (winner > 0):
-                    winner_str = self.get_winner_string(winner)
-                    self.draw_finish_screen(
-                        decoded_retour_world, self.window, winner_str)
-                    msg = ""
-                else:
+                
+                #Check if there is no winner
+                if self.check_winner_exist(decoded_retour_world) == 0:
                     self.draw(decoded_retour_world, self.window, scores, time)
                     msg = ""
+                else:
+                #There exist a winner, check who one or if there is no winner
+                    winner = self.check_winner(decoded_retour_world)
+                    if (winner > 0):
+                        #there is a winner
+                        winner_str = self.get_winner_string(winner)
+                        self.draw_finish_screen(
+                            decoded_retour_world, self.window, winner_str)
+                        msg = ""
+                    elif winner == 0:
+                        #there is no winner
+                        winner_str = "There is no winner"
+                        self.draw_finish_screen(
+                            decoded_retour_world, self.window, winner_str)
+                        msg = ""
+                
             except Exception as ex:
                 print(ex)
                 break
@@ -101,10 +113,18 @@ class Client:
 
     # Check if there is a winner and return the id
     def check_winner(self, world):
-        if world['winner'] > 0:
-            return world["winner"]
+        if world['winners_id'] == 0:
+            return 0
+        else:
+            return world["winners_id"]
+    
+    # Check if a winner exits 
+    def check_winner_exist(self, world):
+        if world['winner_exist'] == 1:
+            return 1
         else:
             return 0
+        
 
     def get_winner_string(self, winner):
         return "The winner is " + str(winner)
@@ -133,6 +153,7 @@ class Client:
 
         libtcod.console_print(window, 20, 20, winner)
         libtcod.console_flush()
+    
 
 
 c = Client()

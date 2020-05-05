@@ -116,16 +116,27 @@ class Game:
                     # publish scores eller något
 
     def check_winner(self):
+        self.world.winner_exist = 1
         winner = None
+        winners_id = 0
+        #check if any player has 0 points, then do not update 
         for e in self.world.entities:
             if type(e) is PlayerEntity:
-                if (winner is None):
+                if(e.points is 0):
+                    return winners_id
+    
+        #check which player has most points
+        for e in self.world.entities:
+            if type(e) is PlayerEntity:
+                if (winner == None):
                     winner = e
+                    winners_id = e.id
                 elif e.points > winner.points:
-                    winner = e
+                    winners_id = e.id
                 else:
                     break
-        return winner
+        
+        return winners_id
 
     def stream_game(self):
         for client in self.server.thread_client_list:
@@ -137,9 +148,9 @@ class Game:
                 self.world.entities.remove(entity)
             else:
                 json_dump = self.world.to_json()
-                # print(json_dump)
+                print(json_dump)
                 client.send_processed_data(json_dump)
-                time.sleep(0.2)
+                time.sleep(0.1)
 
     def run_game(self):
         # initiate clock
@@ -159,7 +170,7 @@ class Game:
             end = time.time()
             self.stream_game()
             self.world.clock = round(end - start, 1)
-            if (end - start) > 200:
+            if (end - start) > 20:
                 time_left = False
 
             # processing the queue that threaded_clients are filling
@@ -186,7 +197,7 @@ class Game:
                     print("id will be checked for capture : " + str(id))
                     self.check_for_capture(id)
 
-        self.world.winner = self.check_winner().id
+        self.world.winners_id = self.check_winner()
         while not time_left:
             self.stream_game()
             print('I have sent the winner to client')
