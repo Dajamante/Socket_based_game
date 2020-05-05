@@ -11,6 +11,10 @@ class World:
         self.world_width = 50
         self.world_height = 50
         self.entities = []
+        # game clock
+        self.winner = 0
+        self.clock = 0
+
 
     # method that returns entity by ID, we need it to move them around
     # and delete them

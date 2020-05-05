@@ -1,5 +1,6 @@
 from server import *
 import queue
+import time
 from _thread import *
 import threading
 from entity import Entity
@@ -133,14 +134,28 @@ class Game:
         
         return False
 
+    def check_winner(self):
+        winner = None
+        for e in self.world.entities:
+            if type(e) is PlayerEntity:
+                if (winner is None):
+                    winner = e
+                elif e.points > winner.points:
+                    winner = e
+                else:
+                    break
+        return winner
 
     def stream_game(self):
         for client in self.server.thread_client_list:
             json_dump = self.world.to_json()
-            # print(json_dump)
+            print(json_dump)
             client.send_processed_data(json_dump)
 
     def run_game(self):
+        #initiate clock
+        start = time.time()
+        time_left = True
         # making players with some distance, probably better way to do it.
         # first player starts at x = 20, y = 20
         natural_distance = 10
@@ -150,11 +165,16 @@ class Game:
         self.make_entities()
         # stream game once at start
         self.stream_game()
-        while True:
-
+        
+        while time_left:
+            end = time.time()
+            self.world.clock = end - start
+            if (end - start) > 20:
+                time_left = False
+            
             # processing the queue that threaded_clients are filling
             if not self.q.empty():
-
+                
                 dict = self.q.get()
                 # sometimes we have none objects that crash the application
                 # we skip when dict is none
@@ -175,7 +195,14 @@ class Game:
                     self.stream_game()
                     print("id will be checked for capture : " + str(id))
                     self.check_for_capture(id)
-
+            
+        
+        self.world.winner = self.check_winner().id
+        while not time_left:
+            self.stream_game()
+            print('I have sent the winner to client')
+            time.sleep(2)
+            
 
 game = Game()
 game.run_game()
