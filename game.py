@@ -3,10 +3,7 @@ import queue
 from _thread import *
 import threading
 from entity import Entity
-
-from entity import TargetEntity
-from entity import PlayerEntity
-from entity import WallEntity
+from entity import TargetEntity, PlayerEntity, WallEntity
 from random import randint
 from world import World
 import json
@@ -41,6 +38,9 @@ class Game:
         start_new_thread(self.server.run, ())
 
     # creating map
+    # hard-coded height on which walls and entities appear to not
+    # interfer with score lines
+
     def make_map(self):
         # Every second wall will be vertical
         verticalWall = False
@@ -48,7 +48,7 @@ class Game:
         for i in range(self.world.max_walls):
             # Decide where wall should start
             wall_start_x = randint(1, self.world.world_width-5)
-            wall_start_y = randint(1, self.world.world_height-5)
+            wall_start_y = randint(1, self.world.world_height-15)
 
             # Each wall can consist of 0-7 tiles
             for j in range(randint(0, 7)):
@@ -70,26 +70,19 @@ class Game:
     def make_entities(self):
 
         for i in range(self.world.max_entities):
-
+            # hardcoded height of spawning to not interfer with score line
             npc = TargetEntity(x=randint(1, self.world.world_width-5), y=randint(
-                1, self.world.world_height-5))
-            # print(type(npc))
-            # if type(npc) is TargetEntity:
-            #    print("Capture the flag")
+                1, self.world.world_height-15))
 
             self.world.entities.append(npc)
 
     # move the entity by id if it does not hit wall
-
-    def update_position(self, id, dx, dy):
-        try:
-            print("tries to update position")
-            if self.check_if_wall(id, dx, dy) is False:
-                print("has checked if wall")
-                ent = self.world.get_entity(id)
-                ent.move(dx, dy)
-        except (TypeError, AttributeError):
-            print(f"what the fuck just happened with {id}")
+    def update_position(self, player_id, dx, dy):
+        entity_player = self.world.get_entity(player_id)
+        print("Tries to update position")
+        if not entity_player.has_hinder(self.world, dx, dy):
+            print("Has checked if wall")
+            entity_player.move(dx, dy)
 
     def update_score(self, player_id):
         player = self.world.get_entity(player_id)
@@ -117,24 +110,6 @@ class Game:
                     self.update_score(player_id)
                     # todo : if len(self.world.entities) - countplayers == 0
                     # publish scores eller något
-
-    # this method is called when a players position is about to get updated
-    # checks if the position it is about to move to is a wall
-    def check_if_wall(self, player_id, dx, dy):
-        player = self.world.get_entity(player_id)
-        pl_x, pl_y = player.get_position()
-        pl_x += dx
-        pl_y += dy
-        for e in self.world.entities:
-            # check for every targets if both
-            # x and y positions match, return true
-            if (type(e) is WallEntity) or (type(e) is PlayerEntity):
-                e_x, e_y = e.get_position()
-                if(pl_x == e_x and pl_y == e_y):
-                    print(f"Player {player_id} hit the wall!")
-                    return True
-
-        return False
 
     def stream_game(self):
         for client in self.server.thread_client_list:
@@ -173,7 +148,7 @@ class Game:
                 elif "move" in dict:
                     id = dict.get('id')
                     dx, dy = dict.get("move")[0], dict.get("move")[1]
-                    self.update_position(id=id, dx=dx, dy=dy)
+                    self.update_position(player_id=id, dx=dx, dy=dy)
                     self.stream_game()
                     print("id will be checked for capture : " + str(id))
                     self.check_for_capture(id)
