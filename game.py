@@ -37,6 +37,7 @@ class Game:
         # launching a threaded server that can accept unlimited clients
         # and create threads for connections
         start_new_thread(self.server.run, ())
+        self.last_streamed = None
 
     # creating map
     # hard-coded height on which walls and entities appear to not
@@ -119,13 +120,13 @@ class Game:
         self.world.winner_exist = 1
         winner = None
         winners_id = 0
-        #check if any player has 0 points, then do not update 
+        # check if any player has 0 points, then do not update
         for e in self.world.entities:
             if type(e) is PlayerEntity:
                 if(e.points is 0):
                     return winners_id
-    
-        #check which player has most points
+
+        # check which player has most points
         for e in self.world.entities:
             if type(e) is PlayerEntity:
                 if (winner == None):
@@ -135,10 +136,12 @@ class Game:
                     winners_id = e.id
                 else:
                     break
-        
+
         return winners_id
 
     def stream_game(self):
+        json_dump = self.world.to_json()
+
         for client in self.server.thread_client_list:
             # flagged closed clients
             if client.open == False:
@@ -146,11 +149,10 @@ class Game:
                 id_remove = client.id
                 entity = self.world.get_entity(id_remove)
                 self.world.entities.remove(entity)
-            else:
-                json_dump = self.world.to_json()
-                print(json_dump)
+            elif json_dump != self.last_streamed:
                 client.send_processed_data(json_dump)
-                time.sleep(0.1)
+
+        self.last_streamed = json_dump
 
     def run_game(self):
         # initiate clock
@@ -169,8 +171,8 @@ class Game:
         while time_left:
             end = time.time()
             self.stream_game()
-            self.world.clock = round(end - start, 1)
-            if (end - start) > 20:
+            self.world.clock = round(end - start, 0)
+            if (end - start) > 40:
                 time_left = False
 
             # processing the queue that threaded_clients are filling
