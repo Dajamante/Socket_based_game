@@ -16,11 +16,7 @@ World: manages entities to a list.
 Server: manage connections throught threaded clients
 
 TODO:
-    1. update score for players -> should be at bottom of screen without targets (aissata)
-    2. making winning condition and eventual replay (clock?) (johanna)
-    3. delete from world all players that are exiting the game (aissata)
     4. rapport
-    5. modify if wall method, do not generate entities where walls are (aissata)
 """
 
 
@@ -139,7 +135,7 @@ class Game:
                 json_dump = self.world.to_json()
                 # print(json_dump)
                 client.send_processed_data(json_dump)
-                time.sleep(0.2)
+                time.sleep(0.1)
 
     def run_game(self):
         # initiate clock
