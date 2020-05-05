@@ -20,16 +20,18 @@ class ThreadedClient():
         self.conn = conn
         self.q = q
         self.id = id
+        self.open = True
 
     def run(self):
 
         while True:
             # data received from client
             data = self.conn.recv(1024).decode('ascii')
-            data = json.loads(data)
             if not data:
                 print('Bye')
+                self.open = False
                 break
+            data = json.loads(data)
 
             # formatting self.id ++ requested move
             # to be able to access that shit later

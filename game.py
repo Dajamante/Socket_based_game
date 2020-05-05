@@ -116,9 +116,16 @@ class Game:
 
     def stream_game(self):
         for client in self.server.thread_client_list:
-            json_dump = self.world.to_json()
-            # print(json_dump)
-            client.send_processed_data(json_dump)
+            # flagged closed clients
+            if client.open == False:
+                self.server.thread_client_list.remove(client)
+                id_remove = client.id
+                entity = self.world.get_entity(id_remove)
+                self.world.entities.remove(entity)
+            else:
+                json_dump = self.world.to_json()
+                # print(json_dump)
+                client.send_processed_data(json_dump)
 
     def run_game(self):
         # making players with some distance, probably better way to do it.

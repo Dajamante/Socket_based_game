@@ -43,10 +43,10 @@ class Client:
                 msg = ""
             except Exception as ex:
                 print(ex)
+                break
 
     def sender(self):
         while True:
-
             # Check for tangenttryckning
             libtcod.sys_check_for_event(
                 libtcod.EVENT_KEY_PRESS, self.key, self.mouse)
