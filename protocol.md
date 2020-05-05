@@ -40,12 +40,19 @@ self.queue = queue
 It creates a threaded_client object (as the name explains, it is a representation of the client on the server, set in a thread). This threaded client takes the data from the actual client and put it in a dictionary. The dictionary is updated with the client id number.
 All the instructions are then put in a queue for processing by the game logic.
 
-// rutor och hur man rör sig mellan olika states
+When the processing is done, the world list is sent to all connected clients. The list is in the below form:
 
-1. Innehålla ett tillståndsdiagram (state diagram) som beskriver vilka tillstånd klienten och servern kan ha samt vad som gör att de övergår från ett tillstånd till ett annat.
-2. Vara så detaljerat att en godtycklig student som har klarat kursen kan bygga en ny klient som fungerar med din server utifrån endast protokollet.
-   Protokollet ska dessutom uppfylla följande krav:
-3. Protokollet ska antingen skicka text (ASCII, ISO8859-1 eller helst UTF8) eller vara binärt.
-4. Ha viss datasäkerhet. Det ska inte gå att krascha servern (eller klienten) genom att skicka trasig data. Ni behöver inte skydda er mot timingattacker.
-5. Protokollet får inte vara programspråkspecifikt. Det är till exempel inte tillåtet att förvänta sig att mottagaren automatiskt kan deserialisera ett Python-objekt.
-6. Protokollet ska delas upp i olika funktioner/metoder.
+// put list here
+
+and terminates with "\n" (ascii-10), so the client knows that the transmission is over.
+
+```python
+msg = ""
+rec_char_byte = self.client_socket.recv(1).decode("ascii")
+while (rec_char_byte is not '\n'):
+    msg += rec_char_byte
+    rec_char_byte = self.client_socket.recv(1).decode("ascii")
+decoded_retour_world = json.loads(msg)
+```
+
+// rutor och hur man rör sig mellan olika states
