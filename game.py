@@ -18,9 +18,11 @@ World: manages entities to a list.
 Server: manage connections throught threaded clients
 
 TODO:
-    3. make score for players (check tutorial part 7)(Aissata)
-    4. making winning condition and eventual replay
-    5. delete from world all players that are exiting the game
+    1. update score for players -> should be at bottom of screen without targets (aissata)
+    2. making winning condition and eventual replay (clock?) (johanna)
+    3. delete from world all players that are exiting the game (aissata)
+    4. rapport
+    5. modify if wall method, do not generate entities where walls are (aissata)
 """
 
 
@@ -68,25 +70,26 @@ class Game:
     def make_entities(self):
 
         for i in range(self.world.max_entities):
+
             npc = TargetEntity(x=randint(1, self.world.world_width-5), y=randint(
                 1, self.world.world_height-5))
             # print(type(npc))
             # if type(npc) is TargetEntity:
             #    print("Capture the flag")
+
             self.world.entities.append(npc)
 
-
     # move the entity by id if it does not hit wall
+
     def update_position(self, id, dx, dy):
-        try: 
+        try:
             print("tries to update position")
             if self.check_if_wall(id, dx, dy) is False:
                 print("has checked if wall")
                 ent = self.world.get_entity(id)
-                ent.move(dx, dy)   
+                ent.move(dx, dy)
         except (TypeError, AttributeError):
             print(f"what the fuck just happened with {id}")
-
 
     def update_score(self, player_id):
         player = self.world.get_entity(player_id)
@@ -114,10 +117,10 @@ class Game:
                     self.update_score(player_id)
                     # todo : if len(self.world.entities) - countplayers == 0
                     # publish scores eller något
-    
+
     # this method is called when a players position is about to get updated
     # checks if the position it is about to move to is a wall
-    def check_if_wall(self, player_id, dx ,dy):
+    def check_if_wall(self, player_id, dx, dy):
         player = self.world.get_entity(player_id)
         pl_x, pl_y = player.get_position()
         pl_x += dx
@@ -130,9 +133,8 @@ class Game:
                 if(pl_x == e_x and pl_y == e_y):
                     print(f"Player {player_id} hit the wall!")
                     return True
-        
-        return False
 
+        return False
 
     def stream_game(self):
         for client in self.server.thread_client_list:
