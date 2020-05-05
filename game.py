@@ -34,6 +34,7 @@ class Game:
         # launching a threaded server that can accept unlimited clients
         # and create threads for connections
         start_new_thread(self.server.run, ())
+        self.last_streamed = None
 
     # creating map
     # hard-coded height on which walls and entities appear to not
@@ -113,18 +114,31 @@ class Game:
                     # publish scores eller något
 
     def check_winner(self):
+        self.world.winner_exist = 1
         winner = None
+        winners_id = 0
+        # check if any player has 0 points, then do not update
         for e in self.world.entities:
             if type(e) is PlayerEntity:
-                if (winner is None):
+                if(e.points is 0):
+                    return winners_id
+
+        # check which player has most points
+        for e in self.world.entities:
+            if type(e) is PlayerEntity:
+                if (winner == None):
                     winner = e
+                    winners_id = e.id
                 elif e.points > winner.points:
-                    winner = e
+                    winners_id = e.id
                 else:
                     break
-        return winner
+
+        return winners_id
 
     def stream_game(self):
+        json_dump = self.world.to_json()
+
         for client in self.server.thread_client_list:
             # flagged closed clients
             if client.open == False:
@@ -132,12 +146,10 @@ class Game:
                 id_remove = client.id
                 entity = self.world.get_entity(id_remove)
                 self.world.entities.remove(entity)
-            else:
-                json_dump = self.world.to_json()
-                # print(json_dump)
-                print(sys.getsizeof(json_dump))
+            elif json_dump != self.last_streamed:
                 client.send_processed_data(json_dump)
-                time.sleep(0.1)
+
+        self.last_streamed = json_dump
 
     def run_game(self):
         # initiate clock
@@ -156,8 +168,8 @@ class Game:
         while time_left:
             end = time.time()
             self.stream_game()
-            self.world.clock = round(end - start, 1)
-            if (end - start) > 200:
+            self.world.clock = round(end - start, 0)
+            if (end - start) > 40:
                 time_left = False
 
             # processing the queue that threaded_clients are filling
@@ -184,7 +196,7 @@ class Game:
                     print("id will be checked for capture : " + str(id))
                     self.check_for_capture(id)
 
-        self.world.winner = self.check_winner().id
+        self.world.winners_id = self.check_winner()
         while not time_left:
             self.stream_game()
             print('I have sent the winner to client')

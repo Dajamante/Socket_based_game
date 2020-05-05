@@ -12,7 +12,8 @@ class World:
         self.world_height = 50
         self.entities = []
         # game clock
-        self.winner = 0
+        self.winner_exist = 0
+        self.winners_id = 0
         self.clock = 0
 
 
