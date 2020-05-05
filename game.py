@@ -68,13 +68,16 @@ class Game:
 
     # creating targets entities
     def make_entities(self):
-
-        for i in range(self.world.max_entities):
+        i = 0
+        while i < self.world.max_entities:
             # hardcoded height of spawning to not interfer with score line
             npc = TargetEntity(x=randint(1, self.world.world_width-5), y=randint(
                 1, self.world.world_height-15))
-
-            self.world.entities.append(npc)
+            if not npc.is_already_occupied(self.world):
+                self.world.entities.append(npc)
+                i += 1
+            else:
+                pass
 
     # move the entity by id if it does not hit wall
     def update_position(self, player_id, dx, dy):

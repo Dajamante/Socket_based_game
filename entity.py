@@ -49,7 +49,8 @@ class Entity:
                 return True
         return False
 
-    def is_already_occupied(self, world, x, y):
+    def is_already_occupied(self, world):
+        x, y = self.get_position()
         for e in world.entities:
             # check for every targets if both
             # x and y positions match, return true
