@@ -19,9 +19,11 @@ World: manages entities to a list.
 Server: manage connections throught threaded clients
 
 TODO:
-    3. make score for players (check tutorial part 7)(Aissata)
-    4. making winning condition and eventual replay
-    5. delete from world all players that are exiting the game
+    1. update score for players -> should be at bottom of screen without targets (aissata)
+    2. making winning condition and eventual replay (clock?) (johanna)
+    3. delete from world all players that are exiting the game (aissata)
+    4. rapport
+    5. modify if wall method, do not generate entities where walls are (aissata)
 """
 
 
@@ -69,12 +71,12 @@ class Game:
     def make_entities(self):
 
         for i in range(self.world.max_entities):
+
             npc = TargetEntity(x=randint(1, self.world.world_width-5), y=randint(
                 1, self.world.world_height-5))
             # print(type(npc))
             # if type(npc) is TargetEntity:
             #    print("Capture the flag")
-            self.world.entities.append(npc)
 
     # move the entity by id if it does not hit wall
 
