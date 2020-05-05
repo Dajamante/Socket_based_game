@@ -40,9 +40,34 @@ self.queue = queue
 It creates a threaded_client object (as the name explains, it is a representation of the client on the server, set in a thread). This threaded client takes the data from the actual client and put it in a dictionary. The dictionary is updated with the client id number.
 All the instructions are then put in a queue for processing by the game logic.
 
-When the processing is done, the world list is sent to all connected clients. The list is in the below form:
+When the processing is done, the world list is sent to all connected clients if something has changed.
 
-// put list here
+```python
+def stream_game(self):
+    # dumping world
+    json_dump = self.world.to_json()
+
+    for client in self.server.thread_client_list:
+        # removing flagged closed clients
+        if client.open == False:
+            self.server.thread_client_list.remove(client)
+            id_remove = client.id
+            entity = self.world.get_entity(id_remove)
+            self.world.entities.remove(entity)
+        # sending world if different from last dump
+        elif json_dump != self.last_streamed:
+            client.send_processed_data(json_dump)
+    # saving sent world as last dump
+    self.last_streamed = json_dump
+```
+
+The list (the world) is in the below form:
+
+```console
+{'blocked': False, 'char': '@', 'color': [23, 237, 76], 'x': 37, 'y': 11}
+{'blocked': False, 'char': '@', 'color': [55, 35, 9], 'x': 24, 'y': 7}
+{'blocked': True, 'char': 'B', 'color': [255, 255, 255], 'id': 1, 'points': 1, 'x': 13, 'y': 13}
+```
 
 and terminates with "\n" (ascii-10), so the client knows that the transmission is over.
 
