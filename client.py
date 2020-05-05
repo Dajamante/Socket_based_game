@@ -7,6 +7,8 @@ from input_handlers import handle_keys
 from entity import Entity
 from window import Window
 from _thread import *
+import sys
+
 SERVER = "localhost"
 PORT = 65432
 
@@ -38,6 +40,7 @@ class Client:
                     rec_char_byte = self.client_socket.recv(1).decode("ascii")
                 # print("msg   :  " + msg)
                 decoded_retour_world = json.loads(msg)
+
                 scores = self.get_scores(decoded_retour_world)
                 self.draw(decoded_retour_world, self.window, scores)
                 msg = ""
@@ -62,6 +65,7 @@ class Client:
                 # in the form of a json object
                 json_dump = json.dumps(action).encode('utf-8')
                 # print(json_dump)
+                print(sys.getsizeof(json_dump))
                 self.client_socket.sendall(json_dump)
 
             # if the dictionary in handle keys have key word exit we close the window:
@@ -78,7 +82,6 @@ class Client:
     def get_scores(self, world):
         scores = ""
         for entity in world['entities']:
-            print(entity)
             if "id" in entity:
                 scores += "Player " + \
                     str(entity['id']) + " : " + \
