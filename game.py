@@ -8,6 +8,7 @@ from entity import TargetEntity, PlayerEntity, WallEntity
 from random import randint
 from world import World
 import json
+import sys
 
 
 """
@@ -134,6 +135,7 @@ class Game:
             else:
                 json_dump = self.world.to_json()
                 # print(json_dump)
+                print(sys.getsizeof(json_dump))
                 client.send_processed_data(json_dump)
                 time.sleep(0.1)
 
