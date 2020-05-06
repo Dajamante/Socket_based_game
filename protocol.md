@@ -2,18 +2,26 @@ Protocol
 
 1. Data exchange:
 
-   We chose to communicate with json because it's universal and easy to debug. We are sending hashmaps (Python dictionaries) in both direction. Json was well adapted for this purpose as the data is small. Our game instantiate a world object which has a list of entities, that is distributed to every connected clients (sys.getsizeof() gives that the size of the world in bytes is smaller than 4000)
+   We chose to communicate with json because it's universal and easy to debug. We are sending lists in both direction. Json was well adapted for this purpose as the data is small. Our game instantiate a world object which has a list of entities, that is distributed to every connected clients (with sys.getsizeof() we got that the size of instructions is smaller than 50 bytes and the world is smaller than 4000 bytes)
+
+   The list (the world) is in the below form:
+
+   ```console
+   {'blocked': False, 'char': '@', 'color': [23, 237, 76], 'x': 37, 'y': 11}
+   {'blocked': False, 'char': '@', 'color': [55, 35, 9], 'x': 24, 'y': 7}
+   {'blocked': True, 'char': 'B', 'color': [255, 255, 255], 'id': 1, 'points': 1, 'x': 13, 'y': 13}
+   ```
 
    ### Client
 
-   The client is instantiated with a socket, and connects to a server (in our case "localhost" and non priority-port).
+   The client is instantiated with a socket, and connects to a server (in our case "localhost" and non priority-port -must be same on server and cients).
 
 ```python
     self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.client_socket.connect((SERVER, PORT))
 ```
 
-Keypresses are handled by the client, saved in a hashmap (Python dictionary) and sent to the server in json format. The dictionary are encoded in UTF-8.
+Keypresses are handled by the client, saved in a list and sent to the server in json format. The dictionary are encoded in ascii.
 It is impossible to crash the client by sending bad data, since it will send only keypress up-down-left-right and exit signal.
 
 ```python
@@ -28,7 +36,7 @@ if "exit" in action:
 
 ### Server
 
-The server has also a listening socket that receives all incoming connections. It also has a queue for operations that will be processed by the main game loop, and a list of threaded clients, to organize distribution to all connected clients.
+The server has also a listening socket that receives all incoming connections. It also has a queue for operations that will be processed by the main game loop, and a list of threaded clients, to organise distribution to all connected clients.
 
 ```python
 self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,7 +45,7 @@ self.server_socket.listen()
 self.queue = queue
 ```
 
-It creates a threaded_client object (as the name explains, it is a representation of the client on the server, set in a thread). This threaded client takes the data from the actual client and put it in a dictionary. The dictionary is updated with the client id number.
+It creates a threaded_client object (as the name explains, it is a representation of the client on the server, set in a thread). This threaded client takes the data from the actual client and put it in a list. The list is updated with the client id.
 All the instructions are then put in a queue for processing by the game logic.
 
 When the processing is done, the world list is sent to all connected clients if something has changed.
@@ -61,15 +69,7 @@ def stream_game(self):
     self.last_streamed = json_dump
 ```
 
-The list (the world) is in the below form:
-
-```console
-{'blocked': False, 'char': '@', 'color': [23, 237, 76], 'x': 37, 'y': 11}
-{'blocked': False, 'char': '@', 'color': [55, 35, 9], 'x': 24, 'y': 7}
-{'blocked': True, 'char': 'B', 'color': [255, 255, 255], 'id': 1, 'points': 1, 'x': 13, 'y': 13}
-```
-
-and terminates with "\n" (ascii-10), so the client knows that the transmission is over.
+The transmission terminates with "\n" (ascii-10), so the client knows that the transmission is over and it can send the world for processing (drawing).
 
 ```python
 msg = ""
@@ -79,5 +79,6 @@ while (rec_char_byte is not '\n'):
     rec_char_byte = self.client_socket.recv(1).decode("ascii")
 decoded_retour_world = json.loads(msg)
 ```
+2. The states:
 
 ![](stategame.png)
