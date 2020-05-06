@@ -1,5 +1,9 @@
 Protocol
 
+PLEASE NOTE:
+We used tcod tutorial for the roguelike game available here. http://rogueliketutorials.com/tutorials/tcod/
+The class input handler is directly copied from the tutorial, the class entity is build upon the entity class from the tutorial, other functions have been developped from this base.
+
 1. Data exchange:
 
    We chose to communicate with json because it's universal and easy to debug. We are sending lists in both direction. Json was well adapted for this purpose as the data is small. Our game instantiate a world object which has a list of entities, that is distributed to every connected clients (with sys.getsizeof() we got that the size of instructions is smaller than 50 bytes and the world is smaller than 4000 bytes)
@@ -79,6 +83,7 @@ while (rec_char_byte is not '\n'):
     rec_char_byte = self.client_socket.recv(1).decode("ascii")
 decoded_retour_world = json.loads(msg)
 ```
+
 2. The states:
 
 ![](stategame.png)
