@@ -169,6 +169,7 @@ class Game:
             end = time.time()
             self.stream_game()
             self.world.clock = round(end - start, 0)
+            # more than 40 seconds was just unbearable.
             if (end - start) > 40:
                 time_left = False
 
